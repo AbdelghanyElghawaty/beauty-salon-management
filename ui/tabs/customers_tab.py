@@ -12,7 +12,7 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QFont, QColor
 
-from theme import Theme
+from utils.theme import Theme
 
 
 VIP_THRESHOLD = 10

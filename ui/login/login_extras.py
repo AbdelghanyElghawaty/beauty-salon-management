@@ -22,7 +22,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt
 
-from theme import Theme
+from utils.theme import Theme
 
 
 # ============================================================

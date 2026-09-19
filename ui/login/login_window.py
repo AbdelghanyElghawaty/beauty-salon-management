@@ -30,8 +30,8 @@ from PySide6.QtGui import (
     QPainter, QBrush
 )
 
-from theme import Theme
-from login_extras import (
+from utils.theme import Theme
+from ui.login.login_extras import (
     play_sound,
     get_hijri_date,
     password_strength,

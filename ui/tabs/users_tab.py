@@ -13,13 +13,13 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QColor, QFont, QGuiApplication
 
-from auth import (
+from core.auth import (
     PERMISSIONS,
     PERMISSION_PRESETS,
     PERMISSION_KEYS,
     get_preset_keys,
 )
-from theme import Theme
+from utils.theme import Theme
 
 
 # ============================================================

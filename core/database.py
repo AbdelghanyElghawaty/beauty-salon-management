@@ -14,7 +14,7 @@ import hmac
 import secrets
 import sqlite3
 from datetime import datetime, timedelta
-from auth import User
+from core.auth import User
 
 # تعطيل cachier للتوافق مع Nuitka (مش محتاجينه أصلاً)
 def cachier(*args, **kwargs):

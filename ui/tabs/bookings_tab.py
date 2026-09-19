@@ -19,7 +19,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt, QDate, QTimer
 from PySide6.QtGui import QColor, QGuiApplication
-from theme import Theme
+from utils.theme import Theme
 
 # ✅ WebEngine للمعاينة الاحترافية (لو متاح)
 try:

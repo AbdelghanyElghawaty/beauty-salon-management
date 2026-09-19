@@ -14,7 +14,7 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QFont, QColor, QIcon, QPixmap
 
-from theme import Theme
+from utils.theme import Theme
 
 
 class MainWindow(QMainWindow):
@@ -234,16 +234,16 @@ class MainWindow(QMainWindow):
     # Tabs
     # ============================================
     def _build_tabs(self):
-        from services_tab import ServicesTab
-        from customers_tab import CustomersTab
-        from bookings_tab import BookingsTab
-        from shifts_tab import ShiftsTab
-        from users_tab import UsersTab
+        from ui.tabs.services_tab import ServicesTab
+        from ui.tabs.customers_tab import CustomersTab
+        from ui.tabs.bookings_tab import BookingsTab
+        from ui.tabs.shifts_tab import ShiftsTab
+        from ui.tabs.users_tab import UsersTab
 
         # ✅ التابات الجديدة
-        from employees_tab import EmployeesTab
-        from inventory_tab import InventoryTab
-        from management_tab import ManagementTab
+        from ui.tabs.employees_tab import EmployeesTab
+        from ui.tabs.inventory_tab import InventoryTab
+        from ui.tabs.management_tab import ManagementTab
 
         self.tab_widgets = []
 
@@ -311,7 +311,7 @@ class MainWindow(QMainWindow):
         # ============================================
         if user.has_permission("view_reports"):
             try:
-                from reports_tab import ReportsTab
+                from ui.tabs.reports_tab import ReportsTab
                 tab = ReportsTab(db, user)
                 self.tabs.addTab(tab, "  📊  التقارير  ")
                 self.tab_widgets.append(tab)
@@ -323,7 +323,7 @@ class MainWindow(QMainWindow):
         # ============================================
         if user.is_admin:
             try:
-                from audit_tab import AuditTab
+                from ui.tabs.audit_tab import AuditTab
                 tab = AuditTab(db, user)
                 self.tabs.addTab(tab, "  📜  سجل العمليات  ")
                 self.tab_widgets.append(tab)
@@ -337,7 +337,7 @@ class MainWindow(QMainWindow):
 
         if user.is_admin:
             try:
-                from settings_tab import SettingsTab
+                from ui.tabs.settings_tab import SettingsTab
                 tab = SettingsTab(db, user)
                 self.tabs.addTab(tab, "  ⚙️  الإعدادات  ")
                 self.tab_widgets.append(tab)

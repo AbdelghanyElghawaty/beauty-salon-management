@@ -29,15 +29,15 @@ except Exception:
 # ============================================================
 # Imports (بعد إعداد DPI)
 # ============================================================
-from database import Database
-from database_extended import ExtendedDatabaseMixin
-from theme import Theme
-from login_window import LoginWindow
-from main_window import MainWindow
+from core.database import Database
+from core.database_extended import ExtendedDatabaseMixin
+from utils.theme import Theme
+from ui.login.login_window import LoginWindow
+from ui.main_window import MainWindow
 
 # ✅ استيراد نظام الحماية
-from license import LicenseManager
-from activation_window import ActivationWindow
+from core.license import LicenseManager
+from ui.activation_window import ActivationWindow
 
 
 # ============================================================

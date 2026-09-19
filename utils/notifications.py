@@ -112,3 +112,4 @@ def build_booking_confirmation(customer_name, service_name, date, time_):
         f"الموعد: {date} الساعة {time_}\n"
         f"نتشرف بزيارتك!"
     )
+

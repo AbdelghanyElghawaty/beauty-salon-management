@@ -12,7 +12,7 @@ from PySide6.QtWidgets import (  # pyright: ignore[reportMissingImports]
 from PySide6.QtCore import Qt, QTimer  # pyright: ignore[reportMissingImports]
 from PySide6.QtGui import QGuiApplication, QFont  # pyright: ignore[reportMissingImports]
 
-from theme import Theme
+from utils.theme import Theme
 
 
 class ActivationWindow(QDialog):
