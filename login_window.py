@@ -31,14 +31,12 @@ from PySide6.QtGui import (
 )
 
 from theme import Theme
-from login_helpers import (
+from login_extras import (
     play_sound,
     get_hijri_date,
     password_strength,
     translate,
     TRANSLATIONS,
-)
-from login_advanced import (
     get_today_stats,
     format_stats_text,
     get_employee_of_month,

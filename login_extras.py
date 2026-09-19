@@ -1,6 +1,13 @@
 """
-Login Advanced — ميزات متقدمة لشاشة الدخول.
+Login Extras — أدوات وميزات إضافية لشاشة الدخول.
 ================================================
+يجمع:
+- Sounds (winsound.Beep)
+- Hijri date
+- QR Code generation
+- Image to base64 (data URI)
+- Password strength
+- Translations (ar/en)
 - Stats Preview (اليوم)
 - Employee of the Month
 - Employee Badge (HTML + QR Code)
@@ -16,15 +23,289 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt
 
 from theme import Theme
-from login_helpers import (
-    image_to_data_uri,
-    generate_qr_data_uri,
-    play_sound,
-)
 
 
 # ============================================================
-# 1) Stats Preview — إحصائيات اليوم
+# 1) الأصوات — Sounds
+# ============================================================
+def play_sound(kind="click"):
+    """
+    يشغّل صوت بسيط باستخدام winsound.Beep.
+
+    الأنواع المتاحة:
+    - click    : نقرة خفيفة
+    - success  : نجاح (نغمة صاعدة)
+    - error    : خطأ (نغمة هابطة)
+    - warning  : تحذير
+    - lock     : قفل الحساب
+    - guest    : دخول ضيف
+    - typing   : كتابة (خفيف جدًا)
+    """
+    try:
+        import winsound
+        sounds = {
+            "click":   [(1000, 25)],
+            "success": [(700, 60), (900, 60), (1200, 100)],
+            "error":   [(500, 100), (300, 160)],
+            "warning": [(600, 90)],
+            "lock":    [(400, 200), (250, 250)],
+            "guest":   [(500, 60), (800, 80), (1000, 60)],
+            "typing":  [(1500, 8)],
+        }
+        for freq, dur in sounds.get(kind, [(1000, 30)]):
+            try:
+                winsound.Beep(freq, dur)
+            except Exception:
+                pass
+    except Exception:
+        pass
+
+
+# ============================================================
+# 2) التاريخ الهجري — Hijri Date
+# ============================================================
+HIJRI_MONTHS = [
+    "محرم", "صفر", "ربيع الأول", "ربيع الآخر",
+    "جمادى الأولى", "جمادى الآخرة", "رجب", "شعبان",
+    "رمضان", "شوال", "ذو القعدة", "ذو الحجة",
+]
+
+
+def get_hijri_date():
+    """
+    يرجع التاريخ الهجري.
+    - لو hijri-converter متثبتة → دقيق
+    - لو مش متثبتة → حساب تقريبي
+    """
+    try:
+        from hijri_converter import Gregorian
+        g = datetime.now()
+        h = Gregorian(g.year, g.month, g.day).to_hijri()
+        return f"{h.day} {HIJRI_MONTHS[h.month - 1]} {h.year} هـ"
+    except ImportError:
+        pass
+    except Exception:
+        pass
+
+    try:
+        g = datetime.now()
+        jd = int((g - datetime(622, 7, 16)).days * 1.030684)
+        year = 622 + jd // 354
+        month = ((jd % 354) // 29) + 1
+        day = (jd % 29) + 1
+        if 1 <= month <= 12:
+            return f"{day} {HIJRI_MONTHS[month - 1]} {year} هـ"
+    except Exception:
+        pass
+
+    return ""
+
+
+# ============================================================
+# 3) QR Code & Image to Data URI
+# ============================================================
+def generate_qr_data_uri(text):
+    """يولّد QR Code كـ data URI (للاستخدام في HTML)."""
+    try:
+        import qrcode
+        from io import BytesIO
+        import base64
+
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_M,
+            box_size=8,
+            border=1,
+        )
+        qr.add_data(text)
+        qr.make(fit=True)
+        img = qr.make_image(fill_color="black", back_color="white")
+
+        buffer = BytesIO()
+        img.save(buffer, format="PNG")
+        img_b64 = base64.b64encode(buffer.getvalue()).decode("ascii")
+        return f"data:image/png;base64,{img_b64}"
+    except Exception:
+        return ""
+
+
+def image_to_data_uri(image_path):
+    """
+    يحول أي صورة (ico/png/jpg) لـ data URI.
+    يدعم .ico عن طريق PIL.
+    """
+    if not image_path or not os.path.exists(image_path):
+        return None
+
+    try:
+        from PIL import Image
+        from io import BytesIO
+        import base64
+
+        img = Image.open(image_path)
+        if img.mode != "RGBA":
+            img = img.convert("RGBA")
+        buf = BytesIO()
+        img.save(buf, format="PNG")
+        b64 = base64.b64encode(buf.getvalue()).decode("ascii")
+        return f"data:image/png;base64,{b64}"
+    except Exception:
+        pass
+
+    try:
+        import base64
+        ext = os.path.splitext(image_path)[1].lower().replace(".", "")
+        if ext in ("png", "jpg", "jpeg", "gif", "bmp", "webp"):
+            if ext == "jpg":
+                ext = "jpeg"
+            with open(image_path, "rb") as f:
+                b64 = base64.b64encode(f.read()).decode("ascii")
+            return f"data:image/{ext};base64,{b64}"
+    except Exception:
+        pass
+
+    return None
+
+
+# ============================================================
+# 4) Password Strength
+# ============================================================
+def password_strength(password):
+    """
+    يرجع (score, label, color).
+    - score: 0-100
+    - label: وصف بالعربي
+    - color: hex color
+    """
+    if not password:
+        return 0, "", "#94a3b8"
+
+    score = 0
+    if len(password) >= 6:
+        score += 25
+    if len(password) >= 10:
+        score += 15
+    if any(c.islower() for c in password):
+        score += 15
+    if any(c.isupper() for c in password):
+        score += 15
+    if any(c.isdigit() for c in password):
+        score += 15
+    if any(not c.isalnum() for c in password):
+        score += 15
+
+    if score < 40:
+        return score, "ضعيف", "#ef4444"
+    elif score < 70:
+        return score, "متوسط", "#f59e0b"
+    elif score < 90:
+        return score, "قوي", "#10b981"
+    else:
+        return score, "قوي جداً 💪", "#10b981"
+
+
+# ============================================================
+# 5) الترجمات — Translations
+# ============================================================
+TRANSLATIONS = {
+    "ar": {
+        "title": "تسجيل الدخول",
+        "username": "اسم المستخدم",
+        "password": "كلمة المرور",
+        "login": "دخول",
+        "remember_me": "تذكرني",
+        "forgot": "نسيت كلمة المرور؟",
+        "guest": "🎭  دخول كضيف (تجريبي)",
+        "footer": "© 2026 — جميع الحقوق محفوظة",
+        "greeting_morning": "صباح الخير 🌅",
+        "greeting_noon": "نهارك سعيد ☀️",
+        "greeting_evening": "مساء الخير 🌆",
+        "greeting_night": "سهرة سعيدة 🌙",
+        "welcome_back": "أهلاً بك مجدداً",
+        "welcome_new": "أهلاً بك",
+        "last_login": "آخر دخول",
+        "db_online": "متصل",
+        "db_offline": "غير متصل",
+        "err_empty": "من فضلك ادخل اسم المستخدم وكلمة المرور",
+        "err_locked": "الحساب مقفول مؤقتاً",
+        "err_try_after": "جرّب تاني بعد",
+        "err_seconds": "ثانية",
+        "err_user_not_found": "المستخدم مش موجود في النظام",
+        "err_wrong_password": "كلمة المرور غير صحيحة",
+        "err_remaining_attempts": "متبقي لك {n} محاولات",
+        "today_stats": "اليوم",
+        "bookings": "حجز",
+        "revenue": "ج.م",
+        "employee_of_month": "🏆 موظف الشهر",
+        "print_badge": "🖨  بطاقة الموظف",
+        "forgot_title": "نسيت كلمة المرور",
+        "forgot_msg": (
+            "🔑  استعادة كلمة المرور\n\n"
+            "لو نسيت كلمة المرور، تواصل مع المسؤول:\n\n"
+            "👤  المسؤول: admin\n"
+            "📞  التليفون: {phone}\n\n"
+            "💡  ملاحظة:\n"
+            "المسؤول فقط هو اللي يقدر يعيد تعيين كلمة المرور\n"
+            "من خلال تاب «المستخدمين»."
+        ),
+    },
+    "en": {
+        "title": "Login",
+        "username": "Username",
+        "password": "Password",
+        "login": "Login",
+        "remember_me": "Remember me",
+        "forgot": "Forgot password?",
+        "guest": "🎭  Guest login (Demo)",
+        "footer": "© 2026 — All rights reserved",
+        "greeting_morning": "Good morning 🌅",
+        "greeting_noon": "Good afternoon ☀️",
+        "greeting_evening": "Good evening 🌆",
+        "greeting_night": "Good night 🌙",
+        "welcome_back": "Welcome back",
+        "welcome_new": "Welcome",
+        "last_login": "Last login",
+        "db_online": "Online",
+        "db_offline": "Offline",
+        "err_empty": "Please enter username and password",
+        "err_locked": "Account temporarily locked",
+        "err_try_after": "Try again after",
+        "err_seconds": "seconds",
+        "err_user_not_found": "User not found",
+        "err_wrong_password": "Incorrect password",
+        "err_remaining_attempts": "{n} attempts remaining",
+        "today_stats": "Today",
+        "bookings": "bookings",
+        "revenue": "EGP",
+        "employee_of_month": "🏆 Employee of Month",
+        "print_badge": "🖨  Employee Badge",
+        "forgot_title": "Forgot Password",
+        "forgot_msg": (
+            "🔑  Password Recovery\n\n"
+            "If you forgot your password, contact the admin:\n\n"
+            "👤  Admin: admin\n"
+            "📞  Phone: {phone}\n\n"
+            "💡  Note:\n"
+            "Only admin can reset passwords\n"
+            "from the «Users» tab."
+        ),
+    },
+}
+
+
+def translate(lang, key, **kwargs):
+    """يرجع النص المترجم مع دعم الكلمات المتغيرة."""
+    text = TRANSLATIONS.get(lang, TRANSLATIONS["ar"]).get(key, key)
+    if kwargs:
+        try:
+            text = text.format(**kwargs)
+        except Exception:
+            pass
+    return text
+
+
+# ============================================================
+# 6) Stats Preview — إحصائيات اليوم
 # ============================================================
 def get_today_stats(db):
     """
@@ -45,11 +326,9 @@ def get_today_stats(db):
 
         for b in today_bookings:
             try:
-                # b = (bid, cname, sname, price, barber, date, time,
-                #      extra_json, extra_total, pm)
                 price = (b[3] or 0) + (b[8] or 0)
                 revenue += price
-                customers_set.add(b[1])  # اسم العميل
+                customers_set.add(b[1])
             except Exception:
                 continue
 
@@ -81,21 +360,16 @@ def format_stats_text(stats, lang="ar"):
 
 
 # ============================================================
-# 2) Employee of the Month
+# 7) Employee of the Month
 # ============================================================
 def get_employee_of_month(db):
-    """
-    يرجع dict فيه:
-    - name: اسم الموظف
-    - revenue: إيراداته في الشهر
-    - bookings: عدد حجوزاته
-    """
+    """يرجع dict فيه بيانات موظف الشهر."""
     try:
         bookings = db.list_bookings()
         now = datetime.now()
         month_start = now.replace(day=1).strftime("%Y-%m-%d")
 
-        data = {}  # {barber: {"revenue": X, "bookings": Y}}
+        data = {}
 
         for b in bookings:
             try:
@@ -114,7 +388,6 @@ def get_employee_of_month(db):
         if not data:
             return None
 
-        # الأحسن حسب الإيرادات
         best_name = max(data.items(), key=lambda x: x[1]["revenue"])[0]
 
         return {
@@ -136,7 +409,6 @@ def format_employee_of_month_text(emp, lang="ar"):
 
     month_name = datetime.now().strftime("%B")
     if lang == "ar":
-        # ترجمة الشهر يدويًا
         month_names_ar = {
             1: "يناير", 2: "فبراير", 3: "مارس", 4: "أبريل",
             5: "مايو", 6: "يونيو", 7: "يوليو", 8: "أغسطس",
@@ -160,13 +432,10 @@ def format_employee_of_month_text(emp, lang="ar"):
 
 
 # ============================================================
-# 3) Employee Badge — بطاقة الموظف
+# 8) Employee Badge — بطاقة الموظف
 # ============================================================
 class EmployeeBadgeDialog(QDialog):
-    """
-    نافذة عرض بطاقة الموظف مع QR Code.
-    البطاقة تتطبع في المتصفح (HTML).
-    """
+    """نافذة عرض بطاقة الموظف مع QR Code."""
 
     def __init__(self, parent=None, db=None, user=None, lang="ar"):
         super().__init__(parent)
@@ -182,7 +451,6 @@ class EmployeeBadgeDialog(QDialog):
         layout.setContentsMargins(20, 20, 20, 20)
         layout.setSpacing(12)
 
-        # العنوان
         title = QLabel("🪪  بطاقة الموظف")
         title.setAlignment(Qt.AlignCenter)
         title.setStyleSheet(
@@ -191,7 +459,6 @@ class EmployeeBadgeDialog(QDialog):
         )
         layout.addWidget(title)
 
-        # المعاينة
         preview = QTextEdit()
         preview.setReadOnly(True)
         preview.setHtml(self._build_badge_html())
@@ -201,7 +468,6 @@ class EmployeeBadgeDialog(QDialog):
         )
         layout.addWidget(preview, stretch=1)
 
-        # الأزرار
         btn_row = QHBoxLayout()
         btn_row.setSpacing(10)
         btn_row.addStretch()
@@ -236,8 +502,6 @@ class EmployeeBadgeDialog(QDialog):
 
     def _build_badge_html(self):
         """يبني HTML للبطاقة."""
-
-        # بيانات الصالون
         try:
             shop_name = self.db.get_setting("shop_name", "صالون الحلاقة") or "صالون الحلاقة"
             shop_phone = self.db.get_setting("shop_phone", "") or ""
@@ -251,12 +515,10 @@ class EmployeeBadgeDialog(QDialog):
             shop_logo = ""
             color = "#3b82f6"
 
-        # اللوجو
         logo_uri = None
         if shop_logo and os.path.exists(shop_logo):
             logo_uri = image_to_data_uri(shop_logo)
 
-        # لو مفيش، دور على beauty-salon.ico أو haircut.ico
         if not logo_uri:
             base_dir = os.path.dirname(os.path.abspath(__file__))
             for name in (
@@ -278,7 +540,6 @@ class EmployeeBadgeDialog(QDialog):
         else:
             logo_html = '<div style="font-size: 64px;">💈</div>'
 
-        # QR Code
         qr_text = (
             f"Barber Shop Employee Badge\n"
             f"Name: {self.user.username}\n"
@@ -301,13 +562,9 @@ class EmployeeBadgeDialog(QDialog):
                 '</div>'
             )
 
-        # الدور
         role_text = "سوبر أدمن" if self.user.is_admin else "موظف"
-
-        # التاريخ
         today = datetime.now().strftime("%Y-%m-%d")
 
-        # إحصائيات الموظف
         try:
             bookings = self.db.list_bookings()
             my_bookings = [
@@ -322,7 +579,6 @@ class EmployeeBadgeDialog(QDialog):
             total_revenue = 0
             total_bookings = 0
 
-        # بيانات الاتصال
         contact_lines = []
         if shop_phone:
             contact_lines.append(f"📞 {shop_phone}")
