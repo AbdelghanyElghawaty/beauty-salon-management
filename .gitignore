@@ -1,0 +1,142 @@
+# ============================================
+# Barber Shop App — .gitignore
+# ============================================
+
+# 🗄️ قواعد البيانات — بتتولد تلقائيًا عند التشغيل
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+
+# 🔑 ملفات الترخيص والمفاتيح
+license.key
+*.key
+*.pem
+
+# 📁 النسخ الاحتياطية
+backups/
+backup_*.json
+*.bak
+*.backup
+
+# 📄 ملفات JSON اللي فيها بيانات مستخدمين
+login_history.json
+last_user.json
+failed_attempts.json
+login_settings.json
+license_settings.json
+license_records.json
+
+# 🛠️ أدوات التطوير الداخلية — ما تتبعتش للعملاء
+license_generator.py
+license_generator_gui.py
+tools/
+
+# 🐍 بايثون
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.venv/
+venv/
+env/
+
+# 📦 بناء التطبيق
+build/
+dist/
+*.spec
+
+# 📝 ملفات النظام
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 📋 ملفات IDE
+.vscode/
+.idea/
+*.sublime-*
+
+# 📝 اللوجز
+*.log
+app.log
+
+# 🧪 الاختبارات والتغطية
+.pytest_cache/
+.coverage
+htmlcov/
+
+
+dist_license/
+backups_licenses/
+__pycache__/
+*.pyc
+.idea/
+dist_nuitka/
+backups/
+backups_licenses/
+
+# ==========================================
+# Python
+# ==========================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+ENV/
+build/
+dist/
+*.egg-info/
+.pytest_cache/
+
+# ==========================================
+# IDE
+# ==========================================
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# ==========================================
+# Build Outputs
+# ==========================================
+dist_license/
+dist_nuitka/
+*.spec
+*.exe
+*.dll
+*.pyd
+
+# ==========================================
+# Backups & Data
+# ==========================================
+backups_licenses/
+receipts/
+reports/
+*.db
+*.sqlite
+*.sqlite3
+*.log
+
+# ==========================================
+# Sensitive Config
+# ==========================================
+license_key.json
+activation.json
+config.json
+settings.json
+
+# ==========================================
+# OS
+# ==========================================
+.DS_Store
+Thumbs.db
+desktop.ini
+receipt_*.png
+receipt_*.html
+receipt_*.pdf

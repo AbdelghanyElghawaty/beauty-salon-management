@@ -1,0 +1,12 @@
+Barber Shop Qt - UI Fix
+========================
+Fixed the "حجز جديد" booking dialog layout.
+
+Changes:
+- Added a vertical QScrollArea for booking content.
+- Separated fixed footer buttons from the scrollable content.
+- Reworked "البيانات الأساسية" into a compact grid layout.
+- Prevented cards/fields from overlapping or being clipped on small screens.
+- Improved spacing, field heights, button alignment, and RTL layout.
+- Dialog now adapts to the available screen size and DPI.
+- No database schema or booking logic was changed.
