@@ -2,83 +2,8 @@
 # Barber Shop App — .gitignore
 # ============================================
 
-# 🗄️ قواعد البيانات — بتتولد تلقائيًا عند التشغيل
-*.db
-*.db-journal
-*.db-wal
-*.db-shm
-*.sqlite
-*.sqlite3
-
-# 🔑 ملفات الترخيص والمفاتيح
-license.key
-*.key
-*.pem
-
-# 📁 النسخ الاحتياطية
-backups/
-backup_*.json
-*.bak
-*.backup
-
-# 📄 ملفات JSON اللي فيها بيانات مستخدمين
-login_history.json
-last_user.json
-failed_attempts.json
-login_settings.json
-license_settings.json
-license_records.json
-
-# 🛠️ أدوات التطوير الداخلية — ما تتبعتش للعملاء
-license_generator.py
-license_generator_gui.py
-tools/
-
-# 🐍 بايثون
-__pycache__/
-*.py[cod]
-*$py.class
-*.egg-info/
-.venv/
-venv/
-env/
-
-# 📦 بناء التطبيق
-build/
-dist/
-*.spec
-
-# 📝 ملفات النظام
-.DS_Store
-Thumbs.db
-desktop.ini
-
-# 📋 ملفات IDE
-.vscode/
-.idea/
-*.sublime-*
-
-# 📝 اللوجز
-*.log
-app.log
-
-# 🧪 الاختبارات والتغطية
-.pytest_cache/
-.coverage
-htmlcov/
-
-
-dist_license/
-backups_licenses/
-__pycache__/
-*.pyc
-.idea/
-dist_nuitka/
-backups/
-backups_licenses/
-
 # ==========================================
-# Python
+# 🐍 Python
 # ==========================================
 __pycache__/
 *.py[cod]
@@ -93,50 +18,97 @@ build/
 dist/
 *.egg-info/
 .pytest_cache/
+.coverage
+htmlcov/
 
 # ==========================================
-# IDE
+# 📋 IDE
 # ==========================================
 .idea/
 .vscode/
 *.swp
 *.swo
+*.sublime-*
 
 # ==========================================
-# Build Outputs
+# 🗄️ Databases
+# ==========================================
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+barber_shop.db
+
+# ==========================================
+# 🔑 License & Secrets
+# ==========================================
+license.key
+*.key
+*.pem
+.env
+.env.*
+!.env.example
+
+# ==========================================
+# 📄 User Data Files (JSON)
+# ==========================================
+login_history.json
+last_user.json
+failed_attempts.json
+login_settings.json
+license_settings.json
+license_records.json
+license_key.json
+activation.json
+config.json
+settings.json
+notifications_settings.json
+
+# ==========================================
+# 📁 Backups & Data
+# ==========================================
+backups/
+backups_licenses/
+backup_*.json
+*.bak
+*.backup
+receipts/
+reports/
+receipt_*.png
+receipt_*.html
+receipt_*.pdf
+
+# ==========================================
+# 🛠️ Dev Tools (لا ترفع أبداً)
+# ==========================================
+license_generator.py
+license_generator_gui.py
+change_password.py
+tools/
+
+# ==========================================
+# 📦 Build Outputs
 # ==========================================
 dist_license/
 dist_nuitka/
+dist/
+build/
 *.spec
 *.exe
 *.dll
 *.pyd
 
 # ==========================================
-# Backups & Data
+# 📝 Logs
 # ==========================================
-backups_licenses/
-receipts/
-reports/
-*.db
-*.sqlite
-*.sqlite3
 *.log
+app.log
 
 # ==========================================
-# Sensitive Config
-# ==========================================
-license_key.json
-activation.json
-config.json
-settings.json
-
-# ==========================================
-# OS
+# 🖥️ OS
 # ==========================================
 .DS_Store
 Thumbs.db
 desktop.ini
-receipt_*.png
-receipt_*.html
-receipt_*.pdf
