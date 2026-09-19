@@ -1,0 +1,19 @@
+# ============================================
+# Barber Shop Management System
+# ============================================
+
+# --- Core ---
+PySide6>=6.5.0
+python-dotenv>=1.0.0
+
+# --- Reports & Export ---
+openpyxl>=3.1.0
+reportlab>=4.0.0
+
+# --- Images & QR ---
+Pillow>=10.0.0
+qrcode>=7.4.0
+
+# --- Optional ---
+requests>=2.31.0
+hijri-converter>=2.3.0
